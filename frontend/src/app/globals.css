@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --bg-start: #0f1a1f;
+  --bg-mid: #1a2b33;
+  --bg-end: #243b45;
+  --signal: #0d9488;
+}
+
+body {
+  min-height: 100vh;
+  color: #f4f7f8;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(13, 148, 136, 0.22), transparent),
+    linear-gradient(165deg, var(--bg-start), var(--bg-mid) 45%, var(--bg-end));
+  font-family: var(--font-sans);
+}
