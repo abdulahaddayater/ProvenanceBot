@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+target/
+*.wasm
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs & coverage
+*.log
+npm-debug.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Misc
+*.tsbuildinfo
+.turbo/
+.cache/

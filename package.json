@@ -1,0 +1,27 @@
+{
+  "name": "provenancebot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ProvenanceBot — verifiable content-sourcing agent on Stellar/Soroban",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "dev:agents": "pnpm --filter @provenancebot/agents dev",
+    "dev:frontend": "pnpm --filter @provenancebot/frontend dev"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
