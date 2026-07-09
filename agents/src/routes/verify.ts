@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { hashContent } from '../lib/hash.js';
 import { loadArchivedSource } from '../lib/archive.js';
+import { fetchUrlMatchesHash } from '../lib/fetch.js';
 import { getSorobanClient } from '../lib/soroban.js';
 
 export async function verifyRoutes(app: FastifyInstance) {
@@ -14,13 +15,7 @@ export async function verifyRoutes(app: FastifyInstance) {
 
     let liveMatch: boolean | null = null;
     try {
-      const res = await fetch(archived.url, { signal: AbortSignal.timeout(5000) });
-      if (res.ok) {
-        const text = await res.text();
-        liveMatch = hashContent(text) === sourceHash;
-      } else {
-        liveMatch = false;
-      }
+      liveMatch = await fetchUrlMatchesHash(archived.url, sourceHash, hashContent);
     } catch {
       liveMatch = null;
     }

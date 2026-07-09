@@ -10,7 +10,8 @@
     "./archive": "./dist/lib/archive.js",
     "./store": "./dist/lib/store.js",
     "./soroban": "./dist/lib/soroban.js",
-    "./contract-id": "./dist/lib/contract-id.js"
+    "./contract-id": "./dist/lib/contract-id.js",
+    "./fetch": "./dist/lib/fetch.js"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",

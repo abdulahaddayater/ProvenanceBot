@@ -21,13 +21,8 @@ export async function GET(
 
   let liveMatch: boolean | null = null;
   try {
-    const res = await fetch(archived.url, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      const text = await res.text();
-      liveMatch = hashContent(text) === sourceHash;
-    } else {
-      liveMatch = false;
-    }
+    const { fetchUrlMatchesHash } = await import('@provenancebot/agents/fetch');
+    liveMatch = await fetchUrlMatchesHash(archived.url, sourceHash, hashContent);
   } catch {
     liveMatch = null;
   }
