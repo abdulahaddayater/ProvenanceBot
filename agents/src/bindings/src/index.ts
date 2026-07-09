@@ -1,5 +1,5 @@
+// @ts-nocheck — generated Soroban contract bindings
 import { Buffer } from "buffer";
-import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,

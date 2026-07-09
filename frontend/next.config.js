@@ -3,8 +3,10 @@ const { withSentryConfig } = require('@sentry/nextjs');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['@provenancebot/agents'],
   experimental: {
     instrumentationHook: true,
+    serverComponentsExternalPackages: ['@stellar/stellar-sdk'],
   },
 };
 

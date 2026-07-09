@@ -4,7 +4,14 @@
   "private": true,
   "description": "ProvenanceBot agent orchestration API — Retriever, Synthesizer, Notary",
   "type": "module",
-  "main": "dist/index.js",
+"exports": {
+    "./pipeline": "./dist/orchestration/pipeline.js",
+    "./hash": "./dist/lib/hash.js",
+    "./archive": "./dist/lib/archive.js",
+    "./store": "./dist/lib/store.js",
+    "./soroban": "./dist/lib/soroban.js",
+    "./contract-id": "./dist/lib/contract-id.js"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",

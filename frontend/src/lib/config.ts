@@ -3,7 +3,7 @@
  * Values are read from NEXT_PUBLIC_* env vars; no business logic yet.
  */
 export const publicConfig = {
-  agentsApiUrl: process.env.NEXT_PUBLIC_AGENTS_API_URL ?? 'http://localhost:3001',
+  agentsApiUrl: process.env.NEXT_PUBLIC_AGENTS_API_URL?.trim() || '(same-origin /api)',
   sorobanRpcUrl: process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ?? 'https://soroban-testnet.stellar.org',
   networkPassphrase:
     process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? 'Test SDF Network ; September 2015',

@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @provenancebot/frontend build",
+  "buildCommand": "pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build",
   "outputDirectory": "frontend/.next",
   "framework": "nextjs"
 }

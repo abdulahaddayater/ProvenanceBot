@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { publicConfig } from './config';
 
 describe('publicConfig (scaffold)', () => {
-  it('exposes default agents API URL', () => {
-    expect(publicConfig.agentsApiUrl).toContain('localhost');
+  it('exposes agents API URL config', () => {
+    expect(publicConfig.agentsApiUrl).toBeTruthy();
   });
 });
