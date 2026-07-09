@@ -34,3 +34,4 @@ coverage/
 *.tsbuildinfo
 .turbo/
 .cache/
+contracts/**/test_snapshots/
