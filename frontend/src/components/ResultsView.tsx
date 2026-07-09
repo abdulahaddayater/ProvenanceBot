@@ -53,6 +53,41 @@ export function ResultsView({ result }: ResultsViewProps) {
         })}
       </div>
 
+      <section className="mt-8 border-t border-white/10 pt-6">
+        <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-100/70">
+          Sources
+        </h3>
+        <ol className="mt-4 space-y-4">
+          {result.sources.map((src) => (
+            <li key={src.index} className="text-sm">
+              <button
+                type="button"
+                onClick={() => setActiveSource(src)}
+                className="text-left hover:text-signal-300"
+              >
+                <span className="font-mono text-signal-400">[{src.index}]</span>{' '}
+                <span className="font-medium text-white">{src.title}</span>
+              </button>
+              <p className="mt-1 text-ink-100/70">
+                {src.publisher && <span>{src.publisher}</span>}
+                {src.publisher && src.publishedAt && <span> · </span>}
+                {src.publishedAt && (
+                  <span>
+                    {new Date(src.publishedAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                    })}
+                  </span>
+                )}
+              </p>
+              {src.trustNote && (
+                <p className="mt-1 text-xs leading-relaxed text-ink-100/50">{src.trustNote}</p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {result.provenance.entryId && (
         <footer className="mt-6 border-t border-white/10 pt-4 text-xs text-ink-100/60">
           On-chain entry #{result.provenance.entryId}

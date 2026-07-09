@@ -21,6 +21,9 @@ export interface SourceResponse {
   sourceHash: string;
   uriHash: string;
   fetchedAt: string;
+  publisher?: string;
+  publishedAt?: string;
+  trustNote?: string;
 }
 
 export interface OrchestrationResult {
@@ -103,6 +106,9 @@ export async function orchestrateQuery(
     sourceHash: s.sourceHash,
     uriHash: s.uriHash,
     fetchedAt: s.fetchedAt,
+    publisher: s.publisher,
+    publishedAt: s.publishedAt,
+    trustNote: s.trustNote,
   }));
 
   if (options.walletAddress && batch.entryId !== null) {

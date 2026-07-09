@@ -5,6 +5,9 @@ export interface SourceResponse {
   sourceHash: string;
   uriHash: string;
   fetchedAt: string;
+  publisher?: string;
+  publishedAt?: string;
+  trustNote?: string;
 }
 
 export interface ClaimMapping {

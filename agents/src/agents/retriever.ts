@@ -7,6 +7,10 @@ export interface RetrievedSource {
   title: string;
   content: string;
   fetchedAt: string;
+  publisher?: string;
+  publishedAt?: string;
+  trustNote?: string;
+  topics?: Array<'findings' | 'health' | 'solutions' | 'policy'>;
 }
 
 export interface RetrieverResult {
@@ -41,6 +45,10 @@ export async function fetchSources(query: string): Promise<RetrieverResult> {
         title: c.title,
         content: c.content,
         fetchedAt: c.fetchedAt,
+        publisher: c.publisher,
+        publishedAt: c.publishedAt,
+        trustNote: c.trustNote,
+        topics: c.topics,
       });
     } catch (err) {
       failures.push({

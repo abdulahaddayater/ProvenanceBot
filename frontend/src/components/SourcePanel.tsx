@@ -48,13 +48,36 @@ export function SourcePanel({ source, entryId, open, onClose }: SourcePanelProps
         aria-label={`Source ${source.index} details`}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 className="font-display text-xl font-semibold text-white">{source.title}</h2>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-signal-400">
+              Source {source.index}
+            </p>
+            <h2 className="mt-1 font-display text-xl font-semibold text-white">{source.title}</h2>
+          </div>
           <button type="button" onClick={onClose} className="text-ink-100/60 hover:text-white" aria-label="Close">
             ✕
           </button>
         </div>
 
         <dl className="space-y-4 text-sm">
+          {source.publisher && (
+            <div>
+              <dt className="text-ink-100/50">Publisher</dt>
+              <dd className="text-ink-100">{source.publisher}</dd>
+            </div>
+          )}
+          {source.publishedAt && (
+            <div>
+              <dt className="text-ink-100/50">Published</dt>
+              <dd className="text-ink-100">
+                {new Date(source.publishedAt).toLocaleDateString(undefined, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </dd>
+            </div>
+          )}
           <div>
             <dt className="text-ink-100/50">URL</dt>
             <dd>
@@ -64,9 +87,15 @@ export function SourcePanel({ source, entryId, open, onClose }: SourcePanelProps
             </dd>
           </div>
           <div>
-            <dt className="text-ink-100/50">Retrieved</dt>
+            <dt className="text-ink-100/50">Retrieved by ProvenanceBot</dt>
             <dd className="text-ink-100">{new Date(source.fetchedAt).toLocaleString()}</dd>
           </div>
+          {source.trustNote && (
+            <div>
+              <dt className="text-ink-100/50">Why this source</dt>
+              <dd className="leading-relaxed text-ink-100">{source.trustNote}</dd>
+            </div>
+          )}
           <div>
             <dt className="text-ink-100/50">Content hash</dt>
             <dd className="font-mono text-xs text-ink-100" title={source.sourceHash}>
