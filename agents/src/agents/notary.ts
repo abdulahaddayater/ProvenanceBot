@@ -1,6 +1,6 @@
 import { archiveSource } from '../lib/archive.js';
 import { hashContent, hashQuery, hashSummary, hashUri } from '../lib/hash.js';
-import { getSorobanClient } from '../lib/soroban.js';
+import { getSorobanClient, type SourceRecordInput } from '../lib/soroban.js';
 import type { RetrievedSource } from './retriever.js';
 import type { SynthesisResult } from './synthesizer.js';
 

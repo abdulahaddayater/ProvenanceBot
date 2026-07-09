@@ -1,13 +1,6 @@
-import {
-  Address,
-  Contract,
-  Keypair,
-  nativeToScVal,
-  rpc,
-  scValToNative,
-  TransactionBuilder,
-  xdr,
-} from '@stellar/stellar-sdk';
+import { Keypair } from '@stellar/stellar-sdk';
+import { basicNodeSigner } from '@stellar/stellar-sdk/contract';
+import { Client, type SourceRecord } from '../bindings/src/index.js';
 import { env } from '../config/env.js';
 import { hexToBytes32 } from './hash.js';
 import { loadContractId } from './contract-id.js';
@@ -24,36 +17,19 @@ export interface SubmitProvenanceResult {
   contractId: string;
 }
 
-function bytesN32ScVal(hex: string): xdr.ScVal {
-  return xdr.ScVal.scvBytes(hexToBytes32(hex));
-}
-
-function sourceRecordScVal(record: SourceRecordInput): xdr.ScVal {
-  return xdr.ScVal.scvMap(
-    new xdr.ScMap([
-      new xdr.ScMapEntry({
-        key: xdr.ScVal.scvSymbol('source_hash'),
-        val: bytesN32ScVal(record.sourceHash),
-      }),
-      new xdr.ScMapEntry({
-        key: xdr.ScVal.scvSymbol('uri_hash'),
-        val: bytesN32ScVal(record.uriHash),
-      }),
-      new xdr.ScMapEntry({
-        key: xdr.ScVal.scvSymbol('retrieved_at'),
-        val: nativeToScVal(record.retrievedAt, { type: 'u64' }),
-      }),
-    ]),
-  );
+function toSourceRecord(input: SourceRecordInput): SourceRecord {
+  return {
+    source_hash: hexToBytes32(input.sourceHash),
+    uri_hash: hexToBytes32(input.uriHash),
+    retrieved_at: BigInt(input.retrievedAt),
+  };
 }
 
 export class SorobanProvenanceClient {
-  private readonly server: rpc.Server;
   private readonly contractId: string;
   private readonly keypair: Keypair | null;
 
   constructor() {
-    this.server = new rpc.Server(env.SOROBAN_RPC_URL);
     this.contractId = loadContractId();
     this.keypair = env.STELLAR_SECRET_KEY ? Keypair.fromSecret(env.STELLAR_SECRET_KEY) : null;
   }
@@ -64,6 +40,18 @@ export class SorobanProvenanceClient {
 
   getContractId(): string {
     return this.contractId;
+  }
+
+  private createClient(): Client {
+    if (!this.keypair) throw new Error('Keypair not configured');
+    const signer = basicNodeSigner(this.keypair, env.STELLAR_NETWORK_PASSPHRASE);
+    return new Client({
+      contractId: this.contractId,
+      networkPassphrase: env.STELLAR_NETWORK_PASSPHRASE,
+      rpcUrl: env.SOROBAN_RPC_URL,
+      publicKey: this.keypair.publicKey(),
+      ...signer,
+    });
   }
 
   async submitProvenance(
@@ -77,51 +65,23 @@ export class SorobanProvenanceClient {
       );
     }
 
-    const contract = new Contract(this.contractId);
-    const account = await this.server.getAccount(this.keypair.publicKey());
+    const client = this.createClient();
+    const assembled = await client.submit_provenance({
+      submitter: this.keypair.publicKey(),
+      summary_hash: hexToBytes32(summaryHash),
+      query_hash: hexToBytes32(queryHash),
+      sources: sources.map(toSourceRecord),
+    });
 
-    const tx = new TransactionBuilder(account, {
-      fee: '1000000',
-      networkPassphrase: env.STELLAR_NETWORK_PASSPHRASE,
-    })
-      .addOperation(
-        contract.call(
-          'submit_provenance',
-          Address.fromString(this.keypair.publicKey()).toScVal(),
-          bytesN32ScVal(summaryHash),
-          bytesN32ScVal(queryHash),
-          xdr.ScVal.scvVec(sources.map(sourceRecordScVal)),
-        ),
-      )
-      .setTimeout(180)
-      .build();
-
-    const prepared = await this.server.prepareTransaction(tx);
-    prepared.sign(this.keypair);
-
-    const sendResponse = await this.server.sendTransaction(prepared);
-    if (sendResponse.status === 'ERROR') {
-      throw new Error(`Transaction failed: ${JSON.stringify(sendResponse.errorResult)}`);
+    const sent = await assembled.signAndSend();
+    const txHash = sent.sendTransactionResponse?.hash;
+    if (!txHash) {
+      throw new Error('Soroban submit succeeded but transaction hash was not returned');
     }
-
-    let getResponse = await this.server.getTransaction(sendResponse.hash);
-    let attempts = 0;
-    while (getResponse.status === 'NOT_FOUND' && attempts < 30) {
-      await new Promise((r) => setTimeout(r, 1000));
-      getResponse = await this.server.getTransaction(sendResponse.hash);
-      attempts++;
-    }
-
-    if (getResponse.status !== 'SUCCESS') {
-      throw new Error(`Transaction ${getResponse.status}: ${sendResponse.hash}`);
-    }
-
-    const returnValue = getResponse.returnValue;
-    const entryId = returnValue ? Number(scValToNative(returnValue)) : 0;
 
     return {
-      entryId,
-      txHash: sendResponse.hash,
+      entryId: Number(sent.result),
+      txHash,
       contractId: this.contractId,
     };
   }
@@ -129,29 +89,12 @@ export class SorobanProvenanceClient {
   async verifySource(entryId: number, sourceHash: string): Promise<boolean> {
     if (!this.contractId || !this.keypair) return false;
 
-    const contract = new Contract(this.contractId);
-    const account = await this.server.getAccount(this.keypair.publicKey());
-
-    const tx = new TransactionBuilder(account, {
-      fee: '100000',
-      networkPassphrase: env.STELLAR_NETWORK_PASSPHRASE,
-    })
-      .addOperation(
-        contract.call(
-          'verify_source',
-          nativeToScVal(entryId, { type: 'u64' }),
-          bytesN32ScVal(sourceHash),
-        ),
-      )
-      .setTimeout(30)
-      .build();
-
-    const sim = await this.server.simulateTransaction(tx);
-    if (rpc.Api.isSimulationError(sim)) {
-      return false;
-    }
-    const val = sim.result?.retval;
-    return val ? Boolean(scValToNative(val)) : false;
+    const client = this.createClient();
+    const assembled = await client.verify_source({
+      id: BigInt(entryId),
+      source_hash: hexToBytes32(sourceHash),
+    });
+    return assembled.result ?? false;
   }
 }
 
