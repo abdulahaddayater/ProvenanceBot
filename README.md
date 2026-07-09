@@ -19,8 +19,8 @@ Journalists, researchers, and fact-checkers who need AI-assisted summaries with 
 
 | Resource | URL / Value |
 |----------|-------------|
-| **Frontend** | https://frontend-smoky-five-926d776993.vercel.app |
-| **Backend** | _Deploy via [Render](render.yaml) or Railway — set `CORS_ORIGIN` to frontend URL_ |
+| **Frontend** | https://provenance-bot-agents-uk4v-iota.vercel.app (set **Root Directory** to repo root or `frontend` — see [Deploy on Vercel](#deploy-on-vercel)) |
+| **Backend** | Embedded in Next.js `/api/*` routes (no separate agents URL needed) |
 | **Contract (testnet)** | `CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32` |
 | **Network** | Stellar Testnet |
 | **Explorer** | [View contract on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32) |
@@ -108,6 +108,16 @@ pnpm --filter @provenancebot/agents test
 ```bash
 pnpm dev:frontend  # http://localhost:3000
 ```
+
+## Deploy on Vercel
+
+The app is a **single Next.js deployment** (UI + `/api/*` backend). Do **not** deploy the `agents/` folder as a standalone project — that URL only shows JSON API metadata.
+
+1. **Vercel → Project Settings → General → Root Directory:** leave blank (repo root) **or** set to `frontend`.
+2. **Do not** set Root Directory to `agents`.
+3. Redeploy after pulling latest `main`.
+4. Open the project **Production** domain (e.g. `your-project.vercel.app`) — not a `-agents-` preview subdomain.
+5. Set env vars: `STELLAR_SECRET_KEY`, `PROVENANCE_CONTRACT_ID`, `NEXT_PUBLIC_PROVENANCE_CONTRACT_ID`, `NEXT_PUBLIC_APP_URL` (your production URL).
 
 ## Verifying a citation yourself
 
