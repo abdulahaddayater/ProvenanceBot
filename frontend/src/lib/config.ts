@@ -7,7 +7,9 @@ export const publicConfig = {
   sorobanRpcUrl: process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ?? 'https://soroban-testnet.stellar.org',
   networkPassphrase:
     process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? 'Test SDF Network ; September 2015',
-  contractId: process.env.NEXT_PUBLIC_PROVENANCE_CONTRACT_ID ?? '',
+  provenanceContractId:
+    process.env.NEXT_PUBLIC_PROVENANCE_CONTRACT_ID ??
+    'CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32',
   walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '',
   walletNetwork: process.env.NEXT_PUBLIC_WALLET_NETWORK ?? 'TESTNET',
   appName: process.env.NEXT_PUBLIC_APP_NAME ?? 'ProvenanceBot',

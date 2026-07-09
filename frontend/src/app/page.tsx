@@ -1,15 +1,22 @@
+import { QueryForm } from '@/components/QueryForm';
+import { TrustExplainer } from '@/components/TrustExplainer';
+
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-6 py-16">
-      <p className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
-        ProvenanceBot
-      </p>
-      <h1 className="mt-4 max-w-xl text-lg text-ink-100 sm:text-xl">
-        Verifiable answers with sources hashed and anchored on Stellar/Soroban.
-      </h1>
-      <p className="mt-6 text-sm text-ink-100/70">
-        Frontend scaffolding only — query UI and verify-source chips land in a later commit.
-      </p>
-    </main>
+    <>
+      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20">
+        <p className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          Verifiable answers for journalists & researchers
+        </p>
+        <p className="mt-4 max-w-xl text-lg text-ink-100/80">
+          Ask a question. Get a cited summary. Every source and summary hash is anchored on Stellar —
+          so citations can be independently verified.
+        </p>
+        <div className="mt-10">
+          <QueryForm />
+        </div>
+      </section>
+      <TrustExplainer />
+    </>
   );
 }

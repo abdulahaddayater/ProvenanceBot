@@ -1,14 +1,14 @@
 # ProvenanceBot Architecture
 
-This document describes the scaffolding-era data flow for ProvenanceBot — a verifiable content-sourcing agent on Stellar/Soroban. Business logic is not implemented yet; the packages below define the intended seams.
+End-to-end data flow for the verifiable content-sourcing agent on Stellar/Soroban.
 
 ## Packages
 
 | Package      | Role                                                       |
 | ------------ | ---------------------------------------------------------- |
-| `contracts/` | Soroban registry for batched provenance records            |
+| `contracts/` | `provenance_log` Soroban contract — batched provenance storage |
 | `agents/`    | Retriever, Synthesizer, Notary + Fastify orchestration API |
-| `frontend/`  | Next.js UI that renders summaries and verify-source chips  |
+| `frontend/`  | Next.js UI — summaries, citation chips, wallet connect   |
 
 ## End-to-end data flow
 
@@ -16,50 +16,62 @@ This document describes the scaffolding-era data flow for ProvenanceBot — a ve
 sequenceDiagram
   participant U as User
   participant FE as Frontend
+  participant W as Freighter
   participant API as Agents API
   participant R as Retriever
   participant N as Notary
   participant S as Synthesizer
-  participant C as Soroban Contract
+  participant A as Content Archive
+  participant C as provenance_log
 
   U->>FE: Submit query
-  FE->>API: POST /api/query
+  FE->>W: Connect wallet
+  FE->>API: POST /api/query { query, walletAddress }
   API->>R: fetchSources(query)
-  R-->>API: source candidates
-  API->>N: hashSources(sources)
-  N-->>API: hashed sources
-  API->>S: summarize(query, hashed sources)
-  S-->>API: summary text
-  API->>N: createBatch(source hashes + summary hash + timestamps)
-  N->>C: write provenance batch
-  C-->>N: tx / record id
-  N-->>API: provenance batch
-  API-->>FE: summary + sources + on-chain refs
-  FE-->>U: summary with verify-source chips
+  R-->>API: 3-5 sources (partial OK)
+  API->>N: hash + archive each source
+  N->>A: store raw content + hash
+  API->>S: summarize with claim mappings
+  S-->>API: summary + sourceIndices per sentence
+  API->>N: submit_provenance batch
+  N->>C: single tx — all sources + summary hash
+  C-->>N: entry id + tx hash
+  N-->>API: provenance record
+  API-->>FE: summary, chips, on-chain refs
+  FE-->>U: cited summary + verify chips
+  U->>FE: Click chip → verify on-chain
+  FE->>API: GET /api/verify-onchain
+  API->>C: verify_source
 ```
 
-### Step-by-step
+## API surface
 
-1. **Query** — The frontend posts a natural-language query to the agents orchestration API (`POST /api/query`).
-2. **Retriever** — Fetches candidate sources (URLs, titles, excerpts) relevant to the query.
-3. **Notary (per source)** — Computes a content hash for each source so later verification can detect tampering.
-4. **Synthesizer** — Produces a grounded summary from the hashed source set (not from unhashed raw blobs alone).
-5. **Notary (batch)** — Bundles source hashes + summary hash + timestamps into a provenance batch and writes it to the Soroban contract.
-6. **Frontend** — Renders the summary and **verify-source** chips. Each chip links a cited source to its on-chain hash record so users can confirm integrity.
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `GET` | `/health` | Liveness + contract status |
+| `GET` | `/status` | Network, contract ID, Soroban config |
+| `POST` | `/api/query` | Full pipeline (wallet required) |
+| `GET` | `/api/verify/:sourceHash` | Archived content + live URL drift |
+| `GET` | `/api/verify-onchain` | `verify_source` simulation |
+| `POST` | `/api/feedback` | Pilot feedback |
+| `GET` | `/admin/interactions` | Wallet interaction log |
+| `GET` | `/admin/export` | Pilot data export |
 
-## API surface (scaffold)
+## On-chain contract
 
-| Method | Path         | Purpose                                              |
-| ------ | ------------ | ---------------------------------------------------- |
-| `GET`  | `/health`    | Liveness                                             |
-| `POST` | `/api/query` | Run the orchestration pipeline (stub response today) |
+`provenance_log` exposes:
 
-## On-chain seam
+- `submit_provenance` — batched write (all sources in one tx)
+- `get_provenance` / `get_provenance_by_summary_hash`
+- `verify_source` — boolean check for citation chips
+- `bump_ttl` — archival safety
 
-The `provenance` contract will eventually expose record/verify entrypoints. Today it only exposes `ping` as a compile/test placeholder. See [PROVENANCE.md](./PROVENANCE.md) for the hash-linking design.
+Contract ID (testnet): see `contracts/testnet-contract-id.txt`.
 
 ## Trust boundaries
 
-- **Agents** hold the signing key that submits batches to Soroban (server-side secret).
-- **Frontend** is read-oriented for verification: RPC URL, network passphrase, and contract ID are public; it does not need the notary secret key.
-- **Hashes**, not full source bodies, are what get anchored on-chain — see PROVENANCE.md.
+- **Agents** sign Soroban transactions with `STELLAR_SECRET_KEY`; wallet address is logged for attribution.
+- **Content archive** preserves fetched bytes off-chain; hashes anchor on-chain.
+- **Frontend** verifies via public RPC — no secret keys in browser.
+
+See [PROVENANCE.md](./PROVENANCE.md) for hash-linking details.
