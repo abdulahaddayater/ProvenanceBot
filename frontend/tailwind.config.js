@@ -9,8 +9,13 @@ module.exports = {
           100: '#e3eaed',
           800: '#1a2b33',
           900: '#0f1a1f',
+          950: '#0a1216',
         },
         signal: {
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#0d9488',
           DEFAULT: '#0d9488',
           soft: '#ccfbf1',
         },
