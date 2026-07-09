@@ -3,5 +3,5 @@
   "installCommand": "pnpm install",
   "buildCommand": "pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build",
   "outputDirectory": "frontend/.next",
-  "framework": null
+  "framework": "nextjs"
 }
