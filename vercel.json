@@ -1,12 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "web": {
-      "root": "frontend/",
-      "framework": "nextjs",
-      "installCommand": "pnpm install",
-      "buildCommand": "pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build"
-    }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": { "service": "web" } }]
+  "framework": "nextjs",
+  "installCommand": "cd .. && pnpm install",
+  "buildCommand": "cd .. && pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build"
 }
