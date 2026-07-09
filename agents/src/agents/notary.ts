@@ -1,32 +1,87 @@
-/**
- * Notary agent — hashes sources, batches provenance payloads, writes to Soroban.
- * Business logic intentionally omitted (scaffolding only).
- */
-import type { SourceCandidate } from './retriever.js';
+import { archiveSource } from '../lib/archive.js';
+import { hashContent, hashQuery, hashSummary, hashUri } from '../lib/hash.js';
+import { getSorobanClient } from '../lib/soroban.js';
+import type { RetrievedSource } from './retriever.js';
+import type { SynthesisResult } from './synthesizer.js';
 
-export interface HashedSource extends SourceCandidate {
-  contentHash: string;
+export interface HashedSource extends RetrievedSource {
+  sourceHash: string;
+  uriHash: string;
 }
 
 export interface ProvenanceBatch {
-  sourceHashes: string[];
+  queryHash: string;
   summaryHash: string;
-  timestamp: string;
-  contractTxId: string | null;
+  sources: HashedSource[];
+  sourceRecords: SourceRecordInput[];
+  entryId: number | null;
+  txHash: string | null;
+  contractId: string;
 }
 
-export const notary = {
-  async hashSources(sources: SourceCandidate[]): Promise<HashedSource[]> {
-    return sources.map((source) => ({
-      ...source,
-      contentHash: '',
-    }));
-  },
+export async function hashAndArchiveSources(sources: RetrievedSource[]): Promise<HashedSource[]> {
+  const hashed: HashedSource[] = [];
 
-  async createBatch(
-    _sources: HashedSource[],
-    _summary: string | null,
-  ): Promise<ProvenanceBatch | null> {
-    return null;
-  },
-};
+  for (const source of sources) {
+    const sourceHash = hashContent(source.content);
+    const uriHash = hashUri(source.url);
+    const record: HashedSource = { ...source, sourceHash, uriHash };
+    hashed.push(record);
+
+    await archiveSource({
+      sourceHash,
+      uriHash,
+      url: source.url,
+      title: source.title,
+      content: source.content,
+      fetchedAt: source.fetchedAt,
+      archivedAt: new Date().toISOString(),
+    });
+  }
+
+  return hashed;
+}
+
+export async function submitProvenanceBatch(
+  query: string,
+  sources: HashedSource[],
+  synthesis: SynthesisResult,
+): Promise<ProvenanceBatch> {
+  const queryHash = hashQuery(query);
+  const summaryHash = hashSummary(synthesis.summary);
+
+  const sourceRecords: SourceRecordInput[] = sources.map((s) => ({
+    sourceHash: s.sourceHash,
+    uriHash: s.uriHash,
+    retrievedAt: Math.floor(new Date(s.fetchedAt).getTime() / 1000),
+  }));
+
+  const sorobanClient = getSorobanClient();
+  const base: ProvenanceBatch = {
+    queryHash,
+    summaryHash,
+    sources,
+    sourceRecords,
+    entryId: null,
+    txHash: null,
+    contractId: sorobanClient.getContractId(),
+  };
+
+  if (!sorobanClient.isConfigured()) {
+    return base;
+  }
+
+  try {
+    const result = await sorobanClient.submitProvenance(summaryHash, queryHash, sourceRecords);
+    return {
+      ...base,
+      entryId: result.entryId,
+      txHash: result.txHash,
+      contractId: result.contractId,
+    };
+  } catch (err) {
+    throw new Error(
+      `Soroban submit failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}

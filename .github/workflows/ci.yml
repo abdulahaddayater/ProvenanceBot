@@ -61,8 +61,12 @@ jobs:
 
       - name: Check contracts
         working-directory: contracts
-        run: cargo check -p provenance
+        run: cargo check -p provenance_log
 
       - name: Build wasm
         working-directory: contracts
-        run: cargo build --release --target wasm32v1-none -p provenance
+        run: cargo build --release --target wasm32v1-none -p provenance_log
+
+      - name: Test contracts
+        working-directory: contracts
+        run: cargo test -p provenance_log
