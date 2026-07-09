@@ -1,0 +1,15 @@
+contracts/
+agents/
+docs/
+.github/
+*.md
+!frontend/**
+node_modules/
+**/node_modules/
+**/target/
+**/.next/
+**/dist/
+**/content-archive/
+**/data/
+**/*.wasm
+.pnpm-store/

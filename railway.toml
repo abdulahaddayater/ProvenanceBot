@@ -1,0 +1,13 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install && pnpm --filter @provenancebot/agents build"
+
+[deploy]
+startCommand = "pnpm --filter @provenancebot/agents start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[deploy.env]
+NODE_ENV = "production"
+PORT = "3001"
