@@ -1,7 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build",
-  "outputDirectory": "frontend/.next",
-  "framework": "nextjs"
+  "experimentalServices": {
+    "web": {
+      "root": "frontend",
+      "mountPath": "/",
+      "framework": "nextjs",
+      "buildCommand": "pnpm --filter @provenancebot/agents build && pnpm --filter @provenancebot/frontend build"
+    },
+    "agents": {
+      "root": "agents",
+      "mountPath": "/api/agents",
+      "buildCommand": "pnpm --filter @provenancebot/agents build"
+    }
+  }
 }
