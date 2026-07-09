@@ -1,0 +1,7 @@
+# Railway / Render deployment for ProvenanceBot agents API
+#
+# Build: pnpm install && pnpm --filter @provenancebot/agents build
+# Start: pnpm --filter @provenancebot/agents start
+#
+# Required env vars — see agents/.env.example
+# Set CORS_ORIGIN to your Vercel frontend URL
