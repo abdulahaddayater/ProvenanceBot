@@ -27,7 +27,7 @@ Use this checklist before submitting ProvenanceBot for Green Belt / Level 4 revi
 - [x] Admin export routes
 - [x] Content archive for source persistence
 - [x] Unit tests for hashing and claim mappings
-- [ ] Integration test against live testnet (requires `STELLAR_SECRET_KEY` in CI)
+- [x] Integration test against live testnet (`pnpm --filter @provenancebot/agents test:integration`)
 
 ## Frontend (`/frontend`)
 

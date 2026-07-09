@@ -12,37 +12,32 @@ Storing full articles on-chain is expensive and unnecessary. Instead we store:
 
 Anyone with the original source bytes (or a re-fetch that normalizes identically) can recompute the hash and compare it to the on-chain record.
 
-## Hashing model (intended)
+## Hashing model (implemented)
 
 ```
-source_i_bytes  --normalize-->  source_i_canonical  --SHA-256-->  H(source_i)
-summary_text    --UTF-8------>  summary_bytes       --SHA-256-->  H(summary)
-
-batch = {
-  source_hashes: [H(source_1), ..., H(source_n)],
-  summary_hash:  H(summary),
-  queried_at:    ISO-8601 / ledger timestamp,
-  recorded_at:   ledger close time
-}
+source_i_bytes  --normalize-->  source_i_canonical  --SHA-256-->  H(source_i)  → source_hash
+uri             --lowercase---->  uri_canonical       --SHA-256-->  H(uri)       → uri_hash
+summary_text    --normalize---->  summary_canonical   --SHA-256-->  H(summary)   → summary_hash
+query_text      --normalize---->  query_canonical     --SHA-256-->  H(query)     → query_hash
 ```
 
-Normalization rules (to be locked before production):
+Implementation: `agents/src/lib/hash.ts` — whitespace normalization, lowercase, SHA-256 hex.
 
-- Stable UTF-8 encoding
-- Trim trailing whitespace; collapse insignificant HTML to text
-- Include canonical URL + retrieval timestamp in a signed envelope when hashing, so the same body at a different URL does not silently collide with a different citation context
+## On-chain record shape (implemented)
 
-## On-chain record shape (intended)
+See `contracts/provenance_log` — `ProvenanceEntry`:
 
 ```
-ProvenanceRecord {
-  batch_id: BytesN<32>,
-  source_hashes: Vec<BytesN<32>>,
+ProvenanceEntry {
   summary_hash: BytesN<32>,
-  timestamp: u64,
+  query_hash: BytesN<32>,
+  sources: Vec<SourceRecord>,   // batched in one submit_provenance tx
+  created_at: u64,
   submitter: Address
 }
 ```
+
+Each `SourceRecord` holds `source_hash`, `uri_hash`, `retrieved_at`.
 
 Verification UX:
 
@@ -63,15 +58,10 @@ flowchart LR
   Syn --> SH[Summary hash]
   HS --> Batch[Notary batch]
   SH --> Batch
-  Batch --> Chain[Soroban ProvenanceContract]
+  Batch --> Chain[provenance_log contract]
   Chain --> UI[Verify-source chips]
 ```
 
-## What is intentionally not specified yet
+## Off-chain archive
 
-- Exact normalize() algorithm and hash domain separation tags
-- Whether to use SHA-256 vs. Soroban-native keccak/sha256 helpers exclusively
-- Retention of raw source blobs off-chain (IPFS, object storage, etc.)
-- Multi-party attestation / threshold notary
-
-Those land with the Notary and contract implementation commits — this file only freezes the **hash-linking** intent for scaffolding.
+Raw source content is stored in `agents/data/content-archive/` keyed by `source_hash`. This preserves the exact bytes hashed at retrieval time even if the live URL changes or disappears. GET `/api/verify/:sourceHash` returns archived content and flags live URL drift.
