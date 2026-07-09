@@ -19,8 +19,8 @@ Journalists, researchers, and fact-checkers who need AI-assisted summaries with 
 
 | Resource | URL / Value |
 |----------|-------------|
-| **Frontend** | _Deploy to Vercel — set `NEXT_PUBLIC_AGENTS_API_URL`_ |
-| **Backend** | _Deploy to Railway/Render — see `agents/railway.toml`_ |
+| **Frontend** | https://frontend-smoky-five-926d776993.vercel.app |
+| **Backend** | _Deploy via [Render](render.yaml) or Railway — set `CORS_ORIGIN` to frontend URL_ |
 | **Contract (testnet)** | `CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32` |
 | **Network** | Stellar Testnet |
 | **Explorer** | [View contract on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32) |

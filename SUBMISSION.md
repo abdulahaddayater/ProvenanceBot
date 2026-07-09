@@ -45,9 +45,9 @@ Use this checklist before submitting ProvenanceBot for Green Belt / Level 4 revi
 
 ## Deployment
 
-- [ ] **Live frontend URL** (Vercel) — _manual: deploy and paste URL_
-- [ ] **Live backend URL** (Railway/Render/Fly) — _manual: deploy and set CORS_
-- [ ] End-to-end test on production URLs
+- [x] **Live frontend URL** (Vercel): https://frontend-smoky-five-926d776993.vercel.app
+- [ ] **Live backend URL** (Render/Railway) — _manual: deploy `agents` and set `NEXT_PUBLIC_AGENTS_API_URL` on Vercel_
+- [ ] End-to-end test on production URLs (after backend deploy)
 
 ## Evidence (manual actions required)
 
