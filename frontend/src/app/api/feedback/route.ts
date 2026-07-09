@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ensureServerEnv } from '@/lib/server-env';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const bodySchema = z.object({
   rating: z.number().int().min(1).max(5),

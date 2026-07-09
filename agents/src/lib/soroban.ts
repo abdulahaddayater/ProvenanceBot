@@ -25,13 +25,23 @@ function toSourceRecord(input: SourceRecordInput): SourceRecord {
   };
 }
 
+function loadKeypair(): Keypair | null {
+  const secret = env.STELLAR_SECRET_KEY?.trim();
+  if (!secret) return null;
+  try {
+    return Keypair.fromSecret(secret);
+  } catch {
+    return null;
+  }
+}
+
 export class SorobanProvenanceClient {
   private readonly contractId: string;
   private readonly keypair: Keypair | null;
 
   constructor() {
     this.contractId = loadContractId();
-    this.keypair = env.STELLAR_SECRET_KEY ? Keypair.fromSecret(env.STELLAR_SECRET_KEY) : null;
+    this.keypair = loadKeypair();
   }
 
   isConfigured(): boolean {

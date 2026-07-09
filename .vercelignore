@@ -1,15 +1,13 @@
 contracts/
-agents/
 docs/
 .github/
 *.md
-!frontend/**
 node_modules/
 **/node_modules/
 **/target/
 **/.next/
 **/dist/
-**/content-archive/
-**/data/
+agents/data/
+agents/**/content-archive/
 **/*.wasm
 .pnpm-store/
