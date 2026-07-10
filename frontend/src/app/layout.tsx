@@ -3,6 +3,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
+import { WalletProvider } from '@/hooks/useWallet';
 
 export const metadata: Metadata = {
   title: 'ProvenanceBot — Verifiable research answers',
@@ -14,9 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="antialiased">
         <AnalyticsProvider>
-          <Header />
-          <main>{children}</main>
-          <FeedbackWidget />
+          <WalletProvider>
+            <Header />
+            <main>{children}</main>
+            <FeedbackWidget />
+          </WalletProvider>
         </AnalyticsProvider>
       </body>
     </html>

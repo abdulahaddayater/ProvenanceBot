@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useWallet } from '@/hooks/useWallet';
 
 export function Header() {
-  const { address, connect, connecting, truncate } = useWallet();
+  const { address, connect, disconnect, connecting, truncate } = useWallet();
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-ink-950/80 backdrop-blur-md">
@@ -27,9 +27,18 @@ export function Header() {
           </Link>
         </nav>
         {address ? (
-          <span className="rounded-full border border-signal-400/40 bg-signal-400/10 px-3 py-1.5 font-mono text-xs text-signal-300">
-            {truncate(address)}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-signal-400/40 bg-signal-400/10 px-3 py-1.5 font-mono text-xs text-signal-300">
+              {truncate(address)}
+            </span>
+            <button
+              type="button"
+              onClick={() => disconnect()}
+              className="rounded-full border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10"
+            >
+              Disconnect
+            </button>
+          </div>
         ) : (
           <button
             type="button"

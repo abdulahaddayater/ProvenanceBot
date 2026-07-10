@@ -13,7 +13,7 @@ export function QueryForm() {
   const [step, setStep] = useState<PipelineStep>('idle');
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { address, isConnected, connect } = useWallet();
+  const { address, isConnected, connect, disconnect } = useWallet();
 
   const runQuery = async () => {
     if (!query.trim()) return;
@@ -82,7 +82,15 @@ export function QueryForm() {
             </label>
           </div>
           <div className="flex gap-2">
-            {!isConnected && (
+            {isConnected ? (
+              <button
+                type="button"
+                onClick={() => disconnect()}
+                className="rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10"
+              >
+                Disconnect Wallet
+              </button>
+            ) : (
               <button
                 type="button"
                 onClick={() => connect()}
