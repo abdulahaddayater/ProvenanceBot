@@ -53,4 +53,22 @@ describe('synthesizer claim mappings', () => {
     expect(lower).not.toContain('here is a concise answer');
     expect(result.claimMappings.length).toBeGreaterThanOrEqual(5);
   });
+
+  it('synthesizes solid-state battery findings without echoing the query', async () => {
+    const { getSolidStateBatterySources } = await import('../search/stub-knowledge.js');
+    const { matchesSolidStateBatteries } = await import('../agents/synthesizer.js');
+    const sources = getSolidStateBatterySources('2026-01-01T00:00:00.000Z');
+    const query = 'What are the latest breakthroughs in solid-state batteries for electric vehicles?';
+
+    expect(matchesSolidStateBatteries(query)).toBe(true);
+
+    const result = await synthesize(query, sources);
+    const lower = result.summary.toLowerCase();
+
+    expect(lower).toContain('solid');
+    expect(lower).toContain('electrolyte');
+    expect(lower).toContain('energy density');
+    expect(lower).not.toContain('systematic reviews on what are the latest');
+    expect(result.claimMappings.length).toBeGreaterThanOrEqual(4);
+  });
 });
