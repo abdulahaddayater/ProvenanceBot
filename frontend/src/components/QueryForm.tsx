@@ -9,7 +9,6 @@ import { ResultsView } from './ResultsView';
 
 export function QueryForm() {
   const [query, setQuery] = useState('');
-  const [demoMode, setDemoMode] = useState(false);
   const [step, setStep] = useState<PipelineStep>('idle');
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,8 +16,8 @@ export function QueryForm() {
 
   const runQuery = async () => {
     if (!query.trim()) return;
-    if (!demoMode && !isConnected) {
-      setError('Connect your Freighter wallet to anchor provenance on-chain, or enable demo mode.');
+    if (!isConnected) {
+      setError('Connect your Freighter wallet to anchor provenance on-chain.');
       return;
     }
 
@@ -30,7 +29,7 @@ export function QueryForm() {
     try {
       setTimeout(() => setStep((s) => (s === 'fetching' ? 'summarizing' : s)), 800);
       setTimeout(() => setStep((s) => (s === 'summarizing' ? 'anchoring' : s)), 1600);
-      const res = await submitQuery(query.trim(), address ?? undefined, demoMode);
+      const res = await submitQuery(query.trim(), address ?? undefined);
       setResult(res);
       setStep('complete');
       trackEvent('query_complete', { entryId: res.provenance.entryId ?? 0 });
@@ -59,28 +58,13 @@ export function QueryForm() {
           className="w-full resize-none rounded-xl border border-white/10 bg-ink-950/50 px-4 py-3 text-base text-white placeholder:text-ink-100/40 focus:border-signal-400/50 focus:outline-none focus:ring-1 focus:ring-signal-400/30"
         />
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2">
-            {!isConnected && !demoMode ? (
-              <p className="text-sm text-amber-200/90">
-                Connect Freighter (testnet) to submit queries with on-chain provenance.
-              </p>
-            ) : demoMode ? (
-              <p className="text-sm text-ink-100/60">
-                Demo mode — citations and hashes only; no on-chain anchor.
-              </p>
-            ) : (
-              <p className="text-sm text-ink-100/60">Submitting as {address?.slice(0, 8)}…</p>
-            )}
-            <label className="flex items-center gap-2 text-sm text-ink-100/70">
-              <input
-                type="checkbox"
-                checked={demoMode}
-                onChange={(e) => setDemoMode(e.target.checked)}
-                className="rounded border-white/20 bg-ink-950/50 text-signal-500 focus:ring-signal-400/30"
-              />
-              Demo mode (no wallet required)
-            </label>
-          </div>
+          {!isConnected ? (
+            <p className="text-sm text-amber-200/90">
+              Connect Freighter (testnet) to submit queries with on-chain provenance.
+            </p>
+          ) : (
+            <p className="text-sm text-ink-100/60">Submitting as {address?.slice(0, 8)}…</p>
+          )}
           <div className="flex gap-2">
             {isConnected ? (
               <button
