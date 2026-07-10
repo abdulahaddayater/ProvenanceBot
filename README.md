@@ -19,6 +19,7 @@ Journalists, researchers, and fact-checkers who need AI-assisted summaries with 
 
 | Resource | URL / Value |
 |----------|-------------|
+| **Demo video** | [Watch on Google Drive](https://drive.google.com/file/d/1yPJdUQcxzL9-Ur7_Mg_CuPeXSFnEL1Ud/view?usp=sharing) |
 | **Frontend** | https://provenance-bot-agents-uk4v-iota.vercel.app (set **Root Directory** to repo root or `frontend` — see [Deploy on Vercel](#deploy-on-vercel)) |
 | **Backend** | Embedded in Next.js `/api/*` routes (no separate agents URL needed) |
 | **Contract (testnet)** | `CAB2CE4EYPPZ6WKNVNBR3OM2AQETZFUISXDV2AJATYZTWCTMJ64EHP32` |
@@ -131,15 +132,35 @@ The app is a **single Next.js deployment** (UI + `/api/*` backend). Do **not** d
    ```
 4. Recompute the summary hash from the displayed text and call `get_provenance_by_summary_hash` — a mismatch means the summary was altered post-anchoring.
 
-## Screenshots (placeholders)
+## Screenshots
 
-| Desktop UI | Mobile UI |
-|------------|-----------|
-| _Add screenshot after deploy_ | _Add screenshot at 375px_ |
+### Desktop — home
 
-| Analytics (PostHog) | Admin / Monitoring |
-|---------------------|-------------------|
-| _Dashboard screenshot_ | _/admin page screenshot_ |
+![ProvenanceBot desktop home](docs/screenshots/desktop-home.png)
+
+### Desktop — query form
+
+![ProvenanceBot query form](docs/screenshots/desktop-home-query.png)
+
+### Desktop — pipeline & cited summary
+
+![ProvenanceBot query results with citation chips](docs/screenshots/desktop-query-results.png)
+
+### Desktop — pilot program
+
+![ProvenanceBot pilot page](docs/screenshots/desktop-pilot.png)
+
+### Desktop — admin dashboard
+
+![ProvenanceBot admin dashboard](docs/screenshots/desktop-admin.png)
+
+### Mobile — home
+
+![ProvenanceBot mobile home](docs/screenshots/mobile-home.png)
+
+### Mobile — pilot program
+
+![ProvenanceBot mobile pilot page](docs/screenshots/mobile-pilot.png)
 
 ## Known limitations & roadmap
 
