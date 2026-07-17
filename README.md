@@ -66,8 +66,8 @@ Submission checklist: [SUBMISSION.md](./SUBMISSION.md)
 ├── agents/          Node/TypeScript — Retriever, Synthesizer, Notary + API
 ├── contracts/       Soroban provenance_log contract (Rust)
 ├── frontend/        Next.js 14 (App Router) + Tailwind
-├── docs/            Architecture, provenance, analytics, demo script
-└── .github/workflows  CI — lint + test + contract tests
+├── docs/            Architecture, provenance, analytics, demo script, contract↔frontend map
+└── .github/workflows  CI (lint/test) + CD (frontend build/deploy, contract wasm/deploy)
 ```
 
 Workspaces are linked with **pnpm** (`pnpm-workspace.yaml`): `agents` and `frontend`.
@@ -119,6 +119,12 @@ The app is a **single Next.js deployment** (UI + `/api/*` backend). Do **not** d
 3. Redeploy after pulling latest `main`.
 4. Open the project **Production** domain (e.g. `your-project.vercel.app`) — not a `-agents-` preview subdomain.
 5. Set env vars: `STELLAR_SECRET_KEY`, `PROVENANCE_CONTRACT_ID`, `NEXT_PUBLIC_PROVENANCE_CONTRACT_ID`, `NEXT_PUBLIC_APP_URL` (your production URL).
+
+### Continuous delivery (GitHub Actions)
+
+- **CI:** `.github/workflows/ci.yml` — lint, tests, contract check/build/test
+- **CD:** `.github/workflows/cd.yml` — production frontend build + contract WASM artifacts; optional automated Vercel / testnet deploy when secrets are set (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `STELLAR_SECRET_KEY`)
+- **Contract ↔ frontend map:** [`docs/SMART_CONTRACT_INTEGRATION.md`](docs/SMART_CONTRACT_INTEGRATION.md)
 
 ## Verifying a citation yourself
 

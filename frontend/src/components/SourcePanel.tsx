@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react';
 import type { SourceResponse } from '@/lib/api';
 import { verifyArchive, verifyOnChain } from '@/lib/api';
 import { trackEvent } from '@/hooks/useAnalytics';
+import {
+  PROVENANCE_CONTRACT_METHODS,
+  buildVerifySourceRequest,
+  getContractLabUrl,
+  getProvenanceContractId,
+} from '@/lib/stellar';
 
 interface SourcePanelProps {
   source: SourceResponse;
@@ -29,9 +35,14 @@ export function SourcePanel({ source, entryId, open, onClose }: SourcePanelProps
     if (!entryId) return;
     setVerifying(true);
     try {
-      const res = await verifyOnChain(entryId, source.sourceHash);
+      // Explicit contract call: provenance_log::verify_source(id, source_hash)
+      const req = buildVerifySourceRequest(entryId, source.sourceHash);
+      const res = await verifyOnChain(req.entryId, req.sourceHash);
       setOnChain(res.verified);
-      trackEvent('onchain_verify', { verified: res.verified });
+      trackEvent('onchain_verify', {
+        verified: res.verified,
+        method: PROVENANCE_CONTRACT_METHODS.verify_source,
+      });
     } finally {
       setVerifying(false);
     }
@@ -115,7 +126,21 @@ export function SourcePanel({ source, entryId, open, onClose }: SourcePanelProps
           </div>
         </dl>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <p className="mt-6 text-xs text-ink-100/50">
+          On-chain method:{' '}
+          <code className="text-signal-300">{PROVENANCE_CONTRACT_METHODS.verify_source}</code>
+          {' · '}
+          <a
+            href={getContractLabUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-signal-400 hover:underline"
+          >
+            Contract {getProvenanceContractId().slice(0, 8)}…
+          </a>
+        </p>
+
+        <div className="mt-3 flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={handleVerify}
